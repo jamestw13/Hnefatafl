@@ -4,7 +4,7 @@ import com.hnef.engine.Alliance;
 import com.hnef.engine.board.Move;
 import com.hnef.engine.board.Board;
 
-import java.util.List;
+import java.util.Collection;
 
 public abstract class Piece {
 
@@ -16,6 +16,10 @@ public abstract class Piece {
     this.piecePosition = piecePosition;
   }
 
-  public abstract List<Move> calculateLegalMoves(final Board board);
+  public Alliance getPieceAlliance() {
+    return this.pieceAlliance;
+  }
+
+  public abstract Collection<Move> calculateLegalMoves(final Board board);
 
 }

@@ -21,20 +21,24 @@ public class Pawn extends Piece {
 
     // TODO add forbidden, king-only coordinates
 
-    /* TODO CHECK COLUMN EXCLUSIONS!!!!!!!!! video #7 ~15 minutes in */
-
     final List<Move> legalMoves = new ArrayList<>();
 
     for (final int candidateCoordinateOffset : CANDIDATE_MOVE_VECTOR_COORDINATES) {
       int candidateDestinationCoordinate = this.piecePosition;
 
       while (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
+
+        if (isFirstColumnExclusion(candidateDestinationCoordinate, candidateCoordinateOffset)
+            || isEleventhColumnExclusion(candidateDestinationCoordinate, candidateDestinationOffset)) {
+          break;
+        }
+
         candidateDestinationCoordinate += candidateDestinationOffset;
 
         if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
 
           final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
-          if (!candidateDestinationTile.isTileOccupied()) {
+          if (!candidateDestinationTile.isTileOccupied() && !isKingOnlySpace(candidateDestinationCoordinate)) {
             legalMoves.add(new Move(board, this, candidateDestinationCoordinate));
           }
         }
@@ -43,6 +47,18 @@ public class Pawn extends Piece {
 
     }
     return Collections.unmodifiableList(legalMoves);
+  }
+
+  private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
+    return BoardUtils.FIRST_COLUMN[currentPosition] && (candidateOffset == -1);
+  }
+
+  private static boolean isEleventhColumnExclusion(final int currentPosition, final int candidateOffset) {
+    return BoardUtils.ELEVENTH_COLUMN[currentPosition] && (candidateOffset == 1);
+  }
+
+  private static boolean isKingOnlySpace(final int currentPosition) {
+    return BoardUtils.KING_ONLY_SPACE[currentPosition];
   }
 
 }

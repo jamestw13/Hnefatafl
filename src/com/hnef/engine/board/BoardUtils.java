@@ -7,6 +7,8 @@ public class BoardUtils {
   public static final boolean[] TENTH_COLUMN = initColumn(9);
   public static final boolean[] ELEVENTH_COLUMN = initColumn(10);
 
+  public final boolean[] KING_ONLY_SPACE = initKingSpaces();
+
   public static final int NUM_TILES = 121;
   public static final int NUM_TILES_PER_ROW = 11;
 
@@ -19,6 +21,15 @@ public class BoardUtils {
     } while (columnNumber < NUM_TILES);
 
     return column;
+  }
+
+  private static boolean[] initKingSpaces() {
+    final boolean[] kingSpaces = new boolean[121];
+
+    kingSpaces[0] = true;
+    kingSpaces[NUM_TILES_PER_ROW - 1] = true;
+    kingSpaces[NUM_TILES - NUM_TILES_PER_ROW - 1] = true;
+    kingSpaces[NUM_TILES - 1] = true;
   }
 
   private BoardUtils() {

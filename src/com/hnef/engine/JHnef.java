@@ -1,6 +1,6 @@
 package com.hnef.engine;
 
-import Board com.hnef.engine.board;
+import com.hnef.engine.board.Board;
 
 public class JHnef {
 

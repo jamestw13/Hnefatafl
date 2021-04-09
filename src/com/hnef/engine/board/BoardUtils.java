@@ -8,7 +8,7 @@ public class BoardUtils {
   public static final boolean[] FIRST_COLUMN = initColumn(0);
   public static final boolean[] LAST_COLUMN = initColumn(NUM_TILES_PER_ROW - 1);
 
-  public final boolean[] KING_ONLY_SPACE = initKingSpaces();
+  public final static boolean[] KING_ONLY_SPACE = initKingSpaces();
 
   private static boolean[] initColumn(int columnNumber) {
     final boolean[] column = new boolean[121];

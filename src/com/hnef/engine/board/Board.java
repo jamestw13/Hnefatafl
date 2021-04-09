@@ -1,9 +1,16 @@
 package com.hnef.engine.board;
 
+import com.hnef.engine.Alliance;
+import com.hnef.engine.pieces.King;
+import com.hnef.engine.pieces.Pawn;
 import com.hnef.engine.pieces.Piece;
 
+import java.lang.StringBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +31,7 @@ public class Board {
 
   @Override
   public String toString() {
-    final StringBulider builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
       final String tileText = this.gameBoard.get(i).toString();
       builder.append(String.format("%3s", tileText));
@@ -67,7 +74,7 @@ public class Board {
     for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
       tiles[i] = Tile.createTile(i, builder.boardConfig.get(i));
     }
-    return Collections.unmodifiableList(tiles);
+    return Collections.unmodifiableList(Arrays.asList(tiles));
   }
 
   public static Board createHnefataflBoard() {
@@ -123,7 +130,7 @@ public class Board {
     Alliance nextMoveMaker;
 
     public Builder() {
-
+      this.boardConfig = new HashMap<>();
     }
 
     public Builder setPiece(final Piece piece) {
@@ -137,7 +144,7 @@ public class Board {
     }
 
     public Board build() {
-      return newBoard(this);
+      return new Board(this);
     }
   }
 

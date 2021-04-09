@@ -2,22 +2,27 @@ package com.hnef.engine.pieces;
 
 import com.hnef.engine.Alliance;
 import com.hnef.engine.board.Board;
+import com.hnef.engine.board.BoardUtils;
 import com.hnef.engine.board.Move;
+import com.hnef.engine.board.Move.NeutralMove;
+import com.hnef.engine.board.Move.AttackMove;
+import com.hnef.engine.board.Tile;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class Pawn extends Piece {
 
   private final static int[] CANDIDATE_MOVE_VECTOR_COORDINATES = { -1, -11, 11, 1 };
 
-  Pawn(final int piecePosition, final Alliance pieceAlliance) {
+  public Pawn(final int piecePosition, final Alliance pieceAlliance) {
     super(piecePosition, pieceAlliance);
   }
 
   @Override
-  public Collection<Move> calculateLegalMoves(Board board) {
+  public Collection<Move> calculateLegalMoves(final Board board) {
 
     final List<Move> legalMoves = new ArrayList<>();
 
@@ -27,20 +32,21 @@ public class Pawn extends Piece {
       while (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
 
         if (isFirstColumnExclusion(candidateDestinationCoordinate, candidateCoordinateOffset)
-            || isLastColumnExclusion(candidateDestinationCoordinate, candidateDestinationOffset)) {
+            || isLastColumnExclusion(candidateDestinationCoordinate, candidateCoordinateOffset)) {
           break;
         }
 
-        candidateDestinationCoordinate += candidateDestinationOffset;
+        candidateDestinationCoordinate += candidateCoordinateOffset;
 
         if (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
 
           final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
           if (!candidateDestinationTile.isTileOccupied() && !isKingOnlySpace(candidateDestinationCoordinate)) {
-            if (isAttackMove(candidateDestinationCoordinate)) {
+            final List<Piece> attackedPieces = isAttackMove(candidateDestinationCoordinate, board);
+            if (attackedPieces.isEmpty()) {
               legalMoves.add(new AttackMove(board, this, candidateDestinationCoordinate, attackedPieces));
             }
-            legalMoves.add(new Move(board, this, candidateDestinationCoordinate));
+            legalMoves.add(new NeutralMove(board, this, candidateDestinationCoordinate));
           }
         }
         break;
@@ -67,10 +73,15 @@ public class Pawn extends Piece {
     return BoardUtils.KING_ONLY_SPACE[currentPosition];
   }
 
-  private final Piece[] isAttackMove(final int currentPosition) {
-    final List<Piece> attackedPieces;
+  private final List<Piece> isAttackMove(final int currentPosition, final Board board) {
+    final List<Piece> attackedPieces = new ArrayList<>();
 
     for (final int candidateOffset : CANDIDATE_MOVE_VECTOR_COORDINATES) {
+
+      if (!BoardUtils.isValidTileCoordinate(currentPosition + candidateOffset)
+          || !BoardUtils.isValidTileCoordinate(currentPosition + (candidateOffset * 2))) {
+        break;
+      }
       final Tile adjacentTile = board.getTile(currentPosition + candidateOffset);
 
       if (adjacentTile.isTileOccupied()) {
@@ -80,12 +91,11 @@ public class Pawn extends Piece {
             if (superAdjacentTile.getPiece().getPieceAlliance() == this.pieceAlliance) {
               attackedPieces.add(adjacentTile.getPiece());
             }
-
           }
-
         }
       }
     }
+
     return Collections.unmodifiableList(attackedPieces);
   }
 

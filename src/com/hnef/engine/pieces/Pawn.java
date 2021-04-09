@@ -19,8 +19,6 @@ public class Pawn extends Piece {
   @Override
   public Collection<Move> calculateLegalMoves(Board board) {
 
-    // TODO add forbidden, king-only coordinates
-
     final List<Move> legalMoves = new ArrayList<>();
 
     for (final int candidateCoordinateOffset : CANDIDATE_MOVE_VECTOR_COORDINATES) {
@@ -29,7 +27,7 @@ public class Pawn extends Piece {
       while (BoardUtils.isValidTileCoordinate(candidateDestinationCoordinate)) {
 
         if (isFirstColumnExclusion(candidateDestinationCoordinate, candidateCoordinateOffset)
-            || isEleventhColumnExclusion(candidateDestinationCoordinate, candidateDestinationOffset)) {
+            || isLastColumnExclusion(candidateDestinationCoordinate, candidateDestinationOffset)) {
           break;
         }
 
@@ -39,6 +37,9 @@ public class Pawn extends Piece {
 
           final Tile candidateDestinationTile = board.getTile(candidateDestinationCoordinate);
           if (!candidateDestinationTile.isTileOccupied() && !isKingOnlySpace(candidateDestinationCoordinate)) {
+            if (isAttackMove(candidateDestinationCoordinate)) {
+              legalMoves.add(new AttackMove(board, this, candidateDestinationCoordinate, attackedPieces));
+            }
             legalMoves.add(new Move(board, this, candidateDestinationCoordinate));
           }
         }
@@ -49,16 +50,43 @@ public class Pawn extends Piece {
     return Collections.unmodifiableList(legalMoves);
   }
 
+  @Override
+  public String toString() {
+    return PieceType.PAWN.toString();
+  }
+
   private static boolean isFirstColumnExclusion(final int currentPosition, final int candidateOffset) {
     return BoardUtils.FIRST_COLUMN[currentPosition] && (candidateOffset == -1);
   }
 
-  private static boolean isEleventhColumnExclusion(final int currentPosition, final int candidateOffset) {
-    return BoardUtils.ELEVENTH_COLUMN[currentPosition] && (candidateOffset == 1);
+  private static boolean isLastColumnExclusion(final int currentPosition, final int candidateOffset) {
+    return BoardUtils.LAST_COLUMN[currentPosition] && (candidateOffset == 1);
   }
 
   private static boolean isKingOnlySpace(final int currentPosition) {
     return BoardUtils.KING_ONLY_SPACE[currentPosition];
+  }
+
+  private final Piece[] isAttackMove(final int currentPosition) {
+    final List<Piece> attackedPieces;
+
+    for (final int candidateOffset : CANDIDATE_MOVE_VECTOR_COORDINATES) {
+      final Tile adjacentTile = board.getTile(currentPosition + candidateOffset);
+
+      if (adjacentTile.isTileOccupied()) {
+        final Tile superAdjacentTile = board.getTile(currentPosition + (candidateOffset * 2));
+        if (superAdjacentTile.isTileOccupied()) {
+          if (adjacentTile.getPiece().getPieceAlliance() != this.pieceAlliance) {
+            if (superAdjacentTile.getPiece().getPieceAlliance() == this.pieceAlliance) {
+              attackedPieces.add(adjacentTile.getPiece());
+            }
+
+          }
+
+        }
+      }
+    }
+    return Collections.unmodifiableList(attackedPieces);
   }
 
 }

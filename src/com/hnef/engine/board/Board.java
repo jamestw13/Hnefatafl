@@ -5,6 +5,7 @@ import com.hnef.engine.pieces.King;
 import com.hnef.engine.pieces.Pawn;
 import com.hnef.engine.pieces.Piece;
 import com.hnef.engine.player.BlackPlayer;
+import com.hnef.engine.player.Player;
 import com.hnef.engine.player.WhitePlayer;
 
 import java.lang.StringBuilder;
@@ -48,6 +49,14 @@ public class Board {
       }
     }
     return builder.toString();
+  }
+
+  public Player whitePlayer() {
+    return this.whitePlayer;
+  }
+
+  public Player blackPlayer() {
+    return this.blackPlayer;
   }
 
   public Collection<Piece> getBlackPieces() {

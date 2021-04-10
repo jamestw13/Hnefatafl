@@ -2,6 +2,7 @@ package com.hnef.engine.player;
 
 import java.util.Collection;
 
+import com.hnef.engine.Alliance;
 import com.hnef.engine.board.Board;
 import com.hnef.engine.board.Move;
 import com.hnef.engine.pieces.King;
@@ -28,5 +29,15 @@ public class WhitePlayer extends Player {
       }
     }
     throw new RuntimeException("Should not reach here!");
+  }
+
+  @Override
+  public Alliance getAlliance() {
+    return Alliance.WHITE;
+  }
+
+  @Override
+  public Player getOpponent() {
+    return this.board.blackPlayer();
   }
 }

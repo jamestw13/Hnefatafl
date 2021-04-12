@@ -1,34 +1,33 @@
 package com.hnef.gui;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import com.hnef.engine.board.Board;
 import com.hnef.engine.board.BoardUtils;
-
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.awt.GridBagLayout;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
+import com.hnef.engine.board.Move;
+import com.hnef.engine.board.Tile;
+import com.hnef.engine.pieces.Piece;
+import com.hnef.engine.player.MoveTransition;
 
 public class Table {
   private final JFrame gameFrame;
   private final BoardPanel boardPanel;
-  private final Board hnefBoard;
+  private Board hnefBoard;
+
+  private Tile sourceTile;
+  private Tile destinationTile;
+  private Piece humanMovedPiece;
 
   private final static Dimension OUTER_FRAME_DIMENSION = new Dimension(600, 600);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400, 530);
@@ -85,6 +84,16 @@ public class Table {
       setPreferredSize(BOARD_PANEL_DIMENSION);
       validate();
     }
+
+    public void drawBoard(final Board board) {
+      removeAll();
+      for (final TilePanel tilePanel : boardTiles) {
+        tilePanel.drawTile(board);
+        add(tilePanel);
+      }
+      validate();
+      repaint();
+    }
   }
 
   private class TilePanel extends JPanel {
@@ -93,12 +102,86 @@ public class Table {
     TilePanel(final BoardPanel boardPanel, final int tileId) {
       super(new GridBagLayout());
       this.tileId = tileId;
-      Border border = BorderFactory.createLineBorder(Color.BLACK);
-      setPreferredSize(TILE_PANEL_DIMENSION);
-      setBackground(Color.decode("#593E1A"));
-      setBorder(border);
+
+      assignTileDesign();
       assignTilePieceIcon(hnefBoard);
+
+      addMouseListener(new MouseListener() {
+
+        @Override
+        public void mouseClicked(final MouseEvent e) {
+          if (SwingUtilities.isRightMouseButton(e)) {
+            sourceTile = null;
+            destinationTile = null;
+            humanMovedPiece = null;
+
+          } else if (SwingUtilities.isLeftMouseButton(e)) {
+            if (sourceTile == null) {
+              sourceTile = hnefBoard.getTile(tileId);
+              humanMovedPiece = sourceTile.getPiece();
+              if (humanMovedPiece == null) {
+                sourceTile = null;
+              }
+
+            } else {
+              destinationTile = hnefBoard.getTile(tileId);
+              final Move move = Move.MoveFactory.createMove(hnefBoard, sourceTile.getTileCoordinate(),
+                  destinationTile.getTileCoordinate());
+              final MoveTransition transition = hnefBoard.currentPlayer().makeMove(move);
+              if (transition.getMoveStatus().isDone()) {
+                hnefBoard = transition.getTransitionBoard();
+                // TODO add move to move log
+              }
+              sourceTile = null;
+              destinationTile = null;
+              humanMovedPiece = null;
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                boardPanel.drawBoard(hnefBoard);
+              }
+            });
+          }
+
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+          // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+          // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+          // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+          // TODO Auto-generated method stub
+
+        }
+
+      });
+
       validate();
+
+    }
+
+    public void drawTile(final Board board) {
+      assignTileDesign();
+
+      assignTilePieceIcon(board);
+      validate();
+      repaint();
     }
 
     private void assignTilePieceIcon(final Board board) {
@@ -115,5 +198,11 @@ public class Table {
       }
     }
 
+    private void assignTileDesign() {
+      Border border = BorderFactory.createLineBorder(Color.BLACK);
+      setPreferredSize(TILE_PANEL_DIMENSION);
+      setBackground(Color.decode("#593E1A"));
+      setBorder(border);
+    }
   }
 }

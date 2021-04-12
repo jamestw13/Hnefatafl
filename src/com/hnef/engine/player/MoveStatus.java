@@ -1,16 +1,18 @@
 package com.hnef.engine.player;
 
 public enum MoveStatus {
-    DONE{
+    DONE {
         @Override
         public boolean isDone() {
             return true;
         }
-    }, ILLEGAL_MOVE{
+    },
+    ILLEGAL_MOVE {
         @Override
         public boolean isDone() {
             return false;
         }
     };
-    abstract boolean isDone();
+
+    public abstract boolean isDone();
 }

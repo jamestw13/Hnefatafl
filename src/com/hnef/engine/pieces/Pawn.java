@@ -69,6 +69,10 @@ public class Pawn extends Piece {
     return BoardUtils.LAST_COLUMN[currentPosition] && (candidateOffset == 1);
   }
 
+  public Pawn movePiece(final Move move) {
+    return new Pawn(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+  }
+
   private static boolean isKingOnlySpace(final int currentPosition) {
     return BoardUtils.KING_ONLY_SPACE[currentPosition];
   }

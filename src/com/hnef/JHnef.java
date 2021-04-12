@@ -1,6 +1,7 @@
-package com.hnef.engine;
+package com.hnef;
 
 import com.hnef.engine.board.Board;
+import com.hnef.gui.Table;
 
 public class JHnef {
 
@@ -8,5 +9,7 @@ public class JHnef {
 
     Board board = Board.createHnefataflBoard();
     System.out.println(board);
+
+    Table table = new Table();
   }
 }

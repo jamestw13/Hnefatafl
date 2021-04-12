@@ -64,4 +64,9 @@ public class King extends Piece {
     return BoardUtils.LAST_COLUMN[currentPosition] && (candidateOffset == 1);
   }
 
+  @Override
+  public King movePiece(final Move move) {
+    return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
+  }
+
 }

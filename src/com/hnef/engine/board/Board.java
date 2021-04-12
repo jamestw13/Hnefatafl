@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Board {
 
@@ -64,6 +66,7 @@ public class Board {
   public Player currentPlayer() {
     return this.currentPlayer;
   }
+
   public Collection<Piece> getBlackPieces() {
     return this.blackPieces;
   }
@@ -169,13 +172,18 @@ public class Board {
     }
 
     public Builder setMoveMaker(final Alliance alliance) {
-      this.nextMoveMaker = nextMoveMaker;
+      this.nextMoveMaker = Alliance.WHITE;
       return this;
     }
 
     public Board build() {
       return new Board(this);
     }
+  }
+
+  public Collection<Move> AllLegalMoves() {
+    return Stream.concat(this.whitePlayer.getLegalMoves().stream(), this.blackPlayer.getLegalMoves().stream())
+        .collect(Collectors.toList());
   }
 
 }
